@@ -14,26 +14,16 @@
 # You should have received a copy of the GNU General Public License along with
 # pylabels.  If not, see <http://www.gnu.org/licenses/>.
 
-import os.path
-
+import labels
 from reportlab.graphics import shapes
 from reportlab.lib import colors
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
-import labels
-from demos.labeldef import build_label_def, build_spec
-
-# Everything in pylabels in in mm, but for row heights we need points
+# Everything in pylabels is in mm, but for row heights we need points
 MM2P = 2.83465
 
-# Get the path to the demos directory.
-base_path = os.path.dirname(__file__)
-
-# get the label definations
-label_defs = build_label_def(os.path.join(base_path, 'labeldef.json'))
-
 # get our spec
-spec = build_spec('Avery 5160', label_defs)
+spec = labels.AveryLabel('Avery 5160')
 
 
 # Create a function to draw each label. This will be given the ReportLab drawing
@@ -73,8 +63,10 @@ def write_address(label, width, height, address):
                 vertical_lines.append((i + 1) * (line_height * .90))
                 vertical_lines.append((i + 1) * (-line_height * .90))
             else:
-                vertical_lines.append(((i + 1) * (line_height)) + (line_height * .65))
-                vertical_lines.append(((i + 1) * (-line_height)) - (line_height * .65))
+                vertical_lines.append(
+                    ((i + 1) * (line_height)) + (line_height * .65))
+                vertical_lines.append(
+                    ((i + 1) * (-line_height)) - (line_height * .65))
     else:
         # odd is a little tricker as the first line gets placed at 0
         # but then we need to move from 1/2 the line height up and down
@@ -92,7 +84,8 @@ def write_address(label, width, height, address):
     vertical_pos = [x + height / 2 for x in vertical_lines]
     # after all that, we can finally write the label
     for c, line in enumerate(address_lines):
-        s = shapes.String(h_location, vertical_pos[c], line, textAnchor="middle")
+        s = shapes.String(
+            h_location, vertical_pos[c], line, textAnchor="middle")
         s.fontName = "Times-Roman"
         s.fontSize = font_size
         s.fillColor = colors.black
@@ -121,4 +114,5 @@ for i in range(label_count):
     sheet.add_label(address)
 
 sheet.save('test.pdf')
-print("{0:d} label(s) output on {1:d} page(s).".format(sheet.label_count, sheet.page_count))
+print("{0:d} label(s) output on {1:d} page(s).".format(
+    sheet.label_count, sheet.page_count))

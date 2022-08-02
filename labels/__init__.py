@@ -16,3 +16,4 @@
 
 from .sheet import Sheet
 from .specifications import Specification, InvalidDimension
+from .labeldef import AveryLabel
