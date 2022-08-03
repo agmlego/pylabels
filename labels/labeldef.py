@@ -18,6 +18,9 @@
 import json
 import os.path
 
+from reportlab.graphics import shapes
+
+from labels.sheet import Sheet
 from labels.specifications import Specification
 
 # just some simple static constants
@@ -53,14 +56,21 @@ class AveryLabel(Specification):
         # get our spec
         self.label_name = label_name
         data = LABEL_DEFS[label_name]
+        data.update(kwargs)
         # this gets the multiplier, if it is defined in inches
         # we multiply to get everything into mm
         multiplier = I2MM if data.pop('measurement') == 'in' else 1
         data.pop("name")
+
         # lets get the defaults out of the dictionary explicitly
-        page_size = SHEET_SIZES[data.pop('page_size')]
-        sheet_width = page_size[0] * multiplier
-        sheet_height = page_size[1] * multiplier
+        if 'sheet_width' in data and 'sheet_height' in data:
+            # prefer direct dimensions
+            sheet_width = data.pop('sheet_width') * multiplier
+            sheet_height = data.pop('sheet_height') * multiplier
+        else:
+            page_size = SHEET_SIZES[data.pop('page_size')]
+            sheet_width = page_size[0] * multiplier
+            sheet_height = page_size[1] * multiplier
         columns = data.pop('columns')
         rows = data.pop('rows')
         label_width = data.pop('label_width') * multiplier
@@ -78,4 +88,16 @@ class AveryLabel(Specification):
             else:
                 opt_data[k] = data[k] * multiplier
         super().__init__(sheet_width=sheet_width, sheet_height=sheet_height, columns=columns, rows=rows,
-                         label_height=label_height, label_width=label_width, **kwargs)
+                         label_height=label_height, label_width=label_width, **opt_data)
+
+
+def _draw_label(label, width, height, data):
+    label.add(shapes.String(x=width/2.0, y=height/2.0,
+              textAnchor='middle', text=str(data)))
+
+
+if __name__ == '__main__':
+    format = 'Avery 5160'
+    sheet = Sheet(AveryLabel(format), _draw_label, border=True)
+    sheet.add_labels(range(sheet.specs.columns*sheet.specs.rows))
+    sheet.save(f'{format.replace(" ","_")}_test.pdf')

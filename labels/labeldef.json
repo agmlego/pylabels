@@ -10,7 +10,8 @@
       "label_width": 2.63,
       "columns": 3,
       "rows": 10,
-      "page_size": "letter",
+      "sheet_width": 8.5,
+      "sheet_height": 11.034,
       "measurement": "in"
     },
     {
