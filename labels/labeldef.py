@@ -35,7 +35,7 @@ def build_label_def(jsonFilePath):
     :param jsonFilePath:
     :return: a dictionary of label specs
     """
-    with open(jsonFilePath) as json_file:
+    with open(jsonFilePath, mode='r', encoding='utf-8') as json_file:
         json_data = json.load(json_file)
         label_defs = {}
         for label in json_data['label']:
