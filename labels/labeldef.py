@@ -17,6 +17,7 @@
 
 import json
 import os.path
+import sys
 
 from reportlab.graphics import shapes
 
@@ -47,8 +48,13 @@ def build_label_def(jsonFilePath):
 
 
 # get the label definitions
+LABEL_DEFS_ROOT = os.path.dirname(__file__)
+
+if hasattr(sys, '_MEIPASS'):
+    LABEL_DEFS_ROOT = os.path.join(sys._MEIPASS, 'pylabels', 'labels')
+
 LABEL_DEFS = build_label_def(os.path.join(
-    os.path.dirname(__file__), 'labeldef.json'))
+    LABEL_DEFS_ROOT, 'labeldef.json'))
 
 
 class AveryLabel(Specification):
